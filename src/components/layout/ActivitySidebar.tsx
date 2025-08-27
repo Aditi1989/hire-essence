@@ -30,6 +30,7 @@ export const ActivitySidebar = () => {
   const { activities, activityFilter, setActivityFilter, filteredActivities } = useCompanyStore();
   const [quickActionsExpanded, setQuickActionsExpanded] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState<Set<ActivityType>>(new Set(['note', 'call', 'task', 'meeting', 'file']));
 
   const handleFilterChange = (types: ActivityType[]) => {
     setActivityFilter({ types });
@@ -38,6 +39,17 @@ export const ActivitySidebar = () => {
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     setActivityFilter({ searchQuery: query });
+  };
+
+  const toggleFilter = (type: ActivityType) => {
+    const newFilters = new Set(activeFilters);
+    if (newFilters.has(type)) {
+      newFilters.delete(type);
+    } else {
+      newFilters.add(type);
+    }
+    setActiveFilters(newFilters);
+    handleFilterChange(Array.from(newFilters));
   };
 
   const formatDate = (dateString: string) => {
@@ -111,100 +123,90 @@ export const ActivitySidebar = () => {
         </TabsList>
 
         {/* Search and Filter */}
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-4">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-1 w-6 bg-primary rounded-full"></div>
+              <h4 className="text-xs font-medium text-text-muted uppercase tracking-wide">Quick Filters</h4>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              {(['note', 'call', 'task', 'meeting', 'file'] as ActivityType[]).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => toggleFilter(type)}
+                  className={cn(
+                    'filter-chip',
+                    activeFilters.has(type) ? 'filter-chip-active' : 'filter-chip-inactive'
+                  )}
+                >
+                  {type === 'note' && '📝'}
+                  {type === 'call' && '📞'}
+                  {type === 'task' && '✓'}
+                  {type === 'meeting' && '📅'}
+                  {type === 'file' && '📎'}
+                  <span className="ml-1 capitalize">{type}s</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
             <Input
               placeholder="Search activities..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-card/50"
             />
           </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="w-full justify-between">
-                <span className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  Filter
-                </span>
-                <Badge variant="secondary" className="text-xs">
-                  {activityFilter.types.length}
-                </Badge>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48" align="start">
-              {(['note', 'call', 'task', 'meeting', 'file'] as ActivityType[]).map((type) => (
-                <DropdownMenuCheckboxItem
-                  key={type}
-                  checked={activityFilter.types.includes(type)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      handleFilterChange([...activityFilter.types, type]);
-                    } else {
-                      handleFilterChange(activityFilter.types.filter(t => t !== type));
-                    }
-                  }}
-                  className="capitalize"
-                >
-                  {type}s & Calls
-                </DropdownMenuCheckboxItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleFilterChange(['note', 'call', 'task', 'meeting', 'file'])}>
-                Select All
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleFilterChange([])}>
-                Deselect All
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         {/* Activity List */}
         <TabsContent value="all" className="flex-1 overflow-y-auto px-4 pb-4 mt-0">
           {displayedActivities.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {displayedActivities.map((activity) => {
                 const Icon = activityIcons[activity.type];
                 const colorClass = activityColors[activity.type];
                 
                 return (
-                  <div key={activity.id} className="flex gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
-                    <div className={cn('w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0', colorClass)}>
-                      <Icon className="h-4 w-4 text-white" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h4 className="text-sm font-medium text-text truncate">
-                          {activity.title}
-                        </h4>
-                        <span className="text-xs text-text-muted flex-shrink-0">
-                          {formatDate(activity.createdOn)}
-                        </span>
+                  <div key={activity.id} className="activity-item">
+                    <div className="flex gap-3">
+                      <div className={cn('w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm', colorClass)}>
+                        <Icon className="h-4 w-4 text-white" />
                       </div>
                       
-                      {activity.description && (
-                        <p className="text-xs text-text-muted line-clamp-2 mb-2">
-                          {activity.description}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-text-muted">
-                          {activity.createdBy.name}
-                        </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h4 className="text-sm font-medium text-text truncate">
+                            {activity.title}
+                          </h4>
+                          <span className="text-xs text-text-muted flex-shrink-0 font-medium">
+                            {formatDate(activity.createdOn)}
+                          </span>
+                        </div>
                         
-                        {activity.type === 'task' && activity.dueDate && (
-                          <Badge 
-                            variant={activity.completed ? 'secondary' : 'outline'} 
-                            className="text-xs"
-                          >
-                            {activity.completed ? 'Completed' : 'Due Soon'}
-                          </Badge>
+                        {activity.description && (
+                          <p className="text-xs text-text-muted line-clamp-2 mb-2 leading-relaxed">
+                            {activity.description}
+                          </p>
                         )}
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-text-muted font-medium">
+                            by {activity.createdBy.name}
+                          </span>
+                          
+                          {activity.type === 'task' && activity.dueDate && (
+                            <Badge 
+                              variant={activity.completed ? 'secondary' : 'outline'} 
+                              className="text-xs"
+                            >
+                              {activity.completed ? '✓ Completed' : '⏰ Due Soon'}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

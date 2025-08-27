@@ -82,7 +82,8 @@ export const CompanyHeader = () => {
             <div className="flex-1">
               <div className="flex items-start gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-text mb-2">{currentCompany.name}</h1>
+                  <h1 className="text-2xl font-bold text-text mb-1">{currentCompany.name}</h1>
+                  <p className="text-sm text-text-muted mb-3 font-medium">Talent CRM Simplified</p>
                   
                   {/* Quick Info */}
                   <div className="flex items-center gap-4 text-sm text-text-muted mb-3">

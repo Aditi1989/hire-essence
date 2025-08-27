@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, Command } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { ThemeToggle } from './ThemeToggle';
 
 export const TopSearchBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +45,7 @@ export const TopSearchBar = () => {
     <>
       <div className="fixed top-0 left-0 right-0 z-[770] bg-surface border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-12">
+          <div className="flex items-center justify-between h-12">
             <div className="relative flex-1 max-w-lg">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
               <Input
@@ -59,6 +60,10 @@ export const TopSearchBar = () => {
                 <Command className="h-3 w-3" />
                 <span>/</span>
               </div>
+            </div>
+            
+            <div className="ml-4">
+              <ThemeToggle />
             </div>
           </div>
         </div>

@@ -90,29 +90,39 @@ export const CompanyEmployedPage = () => {
         </Button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="h-1 w-8 bg-primary rounded-full"></div>
+          <h3 className="text-sm font-medium text-text-muted uppercase tracking-wide">Placement History</h3>
+        </div>
+        
         {mockEmployed.map((employee) => (
-          <div key={employee.id} className="bg-card border border-border rounded-lg p-6 card-hover">
+          <div key={employee.id} className="card-enhanced p-6">
             <div className="flex items-start gap-4">
-              <Avatar className="h-12 w-12 flex-shrink-0">
-                <AvatarFallback className="bg-success/10 text-success font-semibold">
+              <Avatar className="h-14 w-14 flex-shrink-0 ring-2 ring-background shadow-sm">
+                <AvatarFallback className="bg-success/10 text-success font-semibold text-lg">
                   {employee.name.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               
               <div className="flex-1">
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-text">{employee.name}</h3>
-                    <p className="text-text-muted">{employee.title}</p>
+                    <h3 className="text-lg font-semibold text-text mb-1">{employee.name}</h3>
+                    <p className="text-text-muted font-medium">{employee.title}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge className={employee.isActive ? 'bg-success/10 text-success border-success/20' : 'bg-text-muted/10 text-text-muted border-text-muted/20'}>
-                      {employee.isActive ? 'Active' : 'Former Employee'}
+                    <Badge 
+                      className={employee.isActive 
+                        ? 'bg-success/15 text-success border-success/30 font-semibold' 
+                        : 'bg-muted text-muted-foreground border-muted-foreground/30 font-semibold'
+                      }
+                    >
+                      {employee.isActive ? '● Active Employee' : '● Former Employee'}
                     </Badge>
-                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
                       <Award className="h-3 w-3 mr-1" />
-                      Placement
+                      Successful Placement
                     </Badge>
                   </div>
                 </div>
@@ -140,18 +150,28 @@ export const CompanyEmployedPage = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-4">
-                  <Badge variant="outline">
-                    Placed {formatDate(employee.hiredOn)}
-                  </Badge>
-                  <Button variant="outline" size="sm">
-                    View Details
-                  </Button>
-                  {employee.isActive && (
-                    <Button variant="outline" size="sm">
-                      Contact Employee
-                    </Button>
-                  )}
+                <div className="pt-4 border-t border-border">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-semibold">
+                        🎉 Placed {formatDate(employee.hiredOn)}
+                      </Badge>
+                      <span className="text-sm text-text-muted">
+                        • {calculateTenure(employee.startDate)} tenure
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" className="hover:bg-primary/5">
+                        View Details
+                      </Button>
+                      {employee.isActive && (
+                        <Button variant="outline" size="sm" className="hover:bg-success/5">
+                          Contact Employee
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
